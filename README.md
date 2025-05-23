@@ -1,48 +1,50 @@
 # Cordova WebView Crash Recovery Plugin
 
-このCordovaプラグインは、iOS WKWebViewがバックグラウンドで強制終了された後の「白画面」問題を解決します。長時間のバックグラウンド状態やメモリ不足によりWKWebViewプロセスが終了した場合に、自動的に検出して回復する機能を提供します。
+This Cordova plugin solves the "white screen" issue that occurs after iOS WKWebView processes are terminated in the background. It provides automatic detection and recovery when WKWebView processes terminate due to extended background state or memory pressure.
 
-## 背景
+[日本語版](README.ja.md)
 
-iOS版Cordovaアプリにおいて、WKWebViewが10分程度バックグラウンドに放置されると、フォアグラウンド復帰時に白画面（クラッシュ）になる深刻な問題が発生することがあります。これは以下の原因によります：
+## Background
 
-1. **WKWebViewプロセスの独立性**: WKWebViewは別プロセスで動作するため、メインアプリとは独立してkillされる
-2. **iOSのメモリ管理**: バックグラウンド時にiOSがWKWebContentプロセスを強制終了
-3. **クラッシュリカバリーの欠如**: Cordova iOS 6.0以降、WKWebViewが本体統合されたが、重要なクラッシュリカバリー機能が実装されていない
+iOS Cordova applications can experience a serious issue where WKWebView shows a white screen (crash) when returning to the foreground after being in the background for about 10 minutes. This occurs due to:
 
-このプラグインは、WKWebViewのクラッシュを複数の方法で検出し、自動的に回復させる機能を提供します。
+1. **WKWebView process independence**: WKWebView runs in a separate process that can be killed independently from the main app
+2. **iOS memory management**: iOS may terminate WKWebContent processes when in the background
+3. **Lack of crash recovery**: While Cordova iOS 6.0+ integrates WKWebView, it lacks critical crash recovery functionality
 
-## 特徴
+This plugin detects WKWebView crashes through multiple methods and provides automatic recovery.
 
-- **多層防御戦略**: 複数の方法でWKWebViewクラッシュを検出
-  - 公式API `webViewWebContentProcessDidTerminate` の利用
-  - バックグラウンド復帰時の健全性チェック
-  - 定期的な監視による検出
-- **安全な回復メカニズム**: 無限ループ防止、状態保存、選択的回復
-- **WebView完全再作成機能**: 必要に応じてWebViewを再構築（Cordova WebViewEngineの完全再初期化）
-- **状態復元機能**: URL、スクロール位置、LocalStorageの保存と復元
-- **JavaScript API**: 手動回復、健全性チェック、イベントリスナー
-- **デバッグ機能**: デバッグモード、ログ出力、アラート表示
+## Features
 
-## インストール
+- **Multi-layered detection strategy**: Detects WKWebView crashes through multiple methods
+  - Official API `webViewWebContentProcessDidTerminate`
+  - Health checks on background-to-foreground transitions
+  - Periodic monitoring
+- **Safe recovery mechanisms**: Infinite loop prevention, state preservation, selective recovery
+- **Complete WebView recreation**: Rebuilds WebView when necessary (complete re-initialization of Cordova WebViewEngine)
+- **State restoration**: Preserves and restores URL, scroll position, and LocalStorage
+- **JavaScript API**: Manual recovery triggers, health checks, and event listeners
+- **Debugging capabilities**: Debug mode, logging, and alert displays
+
+## Installation
 
 ```bash
 cordova plugin add cordova-plugin-webview-crash-recovery
 ```
 
-## 設定オプション
+## Configuration Options
 
-`config.xml` で以下の設定が可能です：
+Configure in `config.xml`:
 
 ```xml
-<!-- 基本設定 -->
+<!-- Basic Settings -->
 <preference name="CrashRecoveryEnabled" value="true" />
 <preference name="CrashRecoveryMethod" value="recreate" /> <!-- reload | recreate -->
 <preference name="HealthCheckInterval" value="10" />
 <preference name="RecoveryDelay" value="1.0" />
-<preference name="BackupLocalStorage" value="false" /> <!-- LocalStorageのバックアップと復元 -->
+<preference name="BackupLocalStorage" value="false" /> <!-- Backup and restore LocalStorage -->
 
-<!-- デバッグ設定 -->
+<!-- Debug Settings -->
 <preference name="CrashRecoveryDebugMode" value="false" />
 <preference name="CrashRecoveryDebugLevel" value="basic" /> <!-- silent | basic | verbose -->
 <preference name="ShowDebugAlerts" value="false" />
@@ -51,7 +53,7 @@ cordova plugin add cordova-plugin-webview-crash-recovery
 
 ## JavaScript API
 
-### 手動回復トリガー
+### Manual Recovery Trigger
 
 ```javascript
 cordova.plugins.crashRecovery.recover(function() {
@@ -61,64 +63,64 @@ cordova.plugins.crashRecovery.recover(function() {
 });
 ```
 
-### 健全性チェック
+### Health Check
 
 ```javascript
 cordova.plugins.crashRecovery.checkHealth(function(isHealthy) {
     console.log('WebView health status:', isHealthy ? 'healthy' : 'unhealthy');
     if (!isHealthy) {
-        // 回復処理
+        // Initiate recovery
         cordova.plugins.crashRecovery.recover();
     }
 });
 ```
 
-### テスト用API
+### Test API
 
 ```javascript
-// 回復プロセスをテスト（クラッシュをシミュレート）
+// Test recovery process (simulate crash)
 cordova.plugins.crashRecovery.testRecovery();
 
-// WebView状態の継続的モニタリング
+// Continuous monitoring of WebView state
 cordova.plugins.crashRecovery.startMonitoring(function(status) {
     console.log('WebView status:', status);
 });
 ```
 
-### イベントリスナー
+### Event Listeners
 
 ```javascript
-// WebViewがクラッシュした時
+// When WebView crashes
 document.addEventListener('webviewcrashed', function(event) {
     console.log('WebView crashed, reason:', event.detail.reason);
 });
 
-// 回復プロセス開始時
+// When recovery process starts
 document.addEventListener('webviewwillrecover', function() {
     console.log('WebView recovery starting');
 });
 
-// 回復プロセス完了時
+// When recovery process completes
 document.addEventListener('webviewdidrecover', function() {
     console.log('WebView recovery completed');
 });
 
-// 回復プロセス失敗時
+// When recovery process fails
 document.addEventListener('webviewrecoveryfailed', function(event) {
     console.error('WebView recovery failed:', event.detail.error);
 });
 ```
 
-## デバッグ
+## Debugging
 
-デバッグモードを有効にすると、ネイティブからJavaScriptにデバッグ情報が送信されます：
+When debug mode is enabled, debug information is sent from native to JavaScript:
 
 ```javascript
-// デバッグメッセージのカスタムハンドラ
+// Custom handler for debug messages
 cordova.plugins.crashRecovery.onDebugMessage = function(message) {
     console.log('[CrashRecovery]', message);
     
-    // デバッグ情報をUI表示
+    // Display debug info in UI
     var debugOutput = document.getElementById('debug-output');
     if (debugOutput) {
         debugOutput.innerHTML += message + '<br>';
@@ -126,35 +128,35 @@ cordova.plugins.crashRecovery.onDebugMessage = function(message) {
 };
 ```
 
-## 状態保存と復元
+## State Preservation and Restoration
 
-バックグラウンド移行時やクラッシュ検出時に、以下の状態が自動的に保存されます：
+The following states are automatically saved when transitioning to background or detecting a crash:
 
-1. **現在のURL**: WebViewが表示しているページのURL
-2. **スクロール位置**: 現在のページのスクロール位置
-3. **LocalStorage**: `BackupLocalStorage`が有効な場合、LocalStorageの内容も保存（※大量のデータがある場合はパフォーマンスに影響する可能性があります）
+1. **Current URL**: The URL displayed in the WebView
+2. **Scroll position**: Current page scroll position
+3. **LocalStorage**: If `BackupLocalStorage` is enabled, LocalStorage contents are also saved (Note: may impact performance if large amounts of data are stored)
 
-復旧時に、これらの状態が自動的に復元されます。
+These states are automatically restored during recovery.
 
-## 互換性
+## Compatibility
 
-- iOS 12.0以降
-- Cordova iOS 6.0以降
-- Cordova CLI 12.x以降
+- iOS 12.0+
+- Cordova iOS 6.0+
+- Cordova CLI 12.x+
 
-## テスト
+## Testing
 
-このプラグインは実機での動作検証が必要です。以下のシナリオでテストしてください：
+This plugin requires physical device testing. Test with these scenarios:
 
-1. アプリ起動 → 10分バックグラウンド → フォアグラウンド復帰
-2. メモリ不足状態でのカメラプラグイン使用
-3. 大容量ファイル読み込み中のバックグラウンド移行
+1. App launch → 10 minutes in background → foreground return
+2. Camera plugin usage under low memory conditions
+3. Background transition during large file loading
 
-## トラブルシューティング
+## Troubleshooting
 
-### デバッグモードの有効化
+### Enable Debug Mode
 
-問題が発生した場合は、デバッグモードを有効にすることで詳細な情報が得られます：
+For detailed information when issues occur, enable debug mode:
 
 ```xml
 <preference name="CrashRecoveryDebugMode" value="true" />
@@ -163,16 +165,16 @@ cordova.plugins.crashRecovery.onDebugMessage = function(message) {
 <preference name="LogToJavaScript" value="true" />
 ```
 
-### 回復方法の切り替え
+### Switch Recovery Method
 
-クラッシュが頻繁に発生する場合、`recreate`モードを使用してください：
+If crashes occur frequently, use the `recreate` mode:
 
 ```xml
 <preference name="CrashRecoveryMethod" value="recreate" />
 ```
 
-このモードでは、WebViewを完全に再作成し、Cordovaエンジンも再初期化します。
+This mode completely recreates the WebView and reinitializes the Cordova engine.
 
-## ライセンス
+## License
 
 MIT
