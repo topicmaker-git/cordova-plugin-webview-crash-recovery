@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-webview-crash-recovery" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>WebViewCrashRecovery</name>
+    <description>Cordova plugin to recover from iOS WKWebView crashes</description>
+    <license>MIT</license>
+    <keywords>cordova,webview,wkwebview,crash,recovery,ios</keywords>
+    <engines>
+        <engine name="cordova" version=">=6.0.0" />
+        <engine name="cordova-ios" version=">=6.0.0" />
+    </engines>
+    
+    <js-module src="www/crash-recovery.js" name="crashRecovery">
+        <clobbers target="cordova.plugins.crashRecovery" />
+    </js-module>
+    
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="WebViewCrashRecovery">
+                <param name="ios-package" value="WebViewCrashRecovery" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+        
+        <header-file src="src/ios/WebViewCrashRecovery.h" />
+        <source-file src="src/ios/WebViewCrashRecovery.m" />
+        <header-file src="src/ios/CDVWebViewRecoveryDelegate.h" />
+        
+        <preference name="CrashRecoveryEnabled" default="true" />
+        <preference name="CrashRecoveryMethod" default="recreate" />
+        <preference name="HealthCheckInterval" default="10" />
+        <preference name="RecoveryDelay" default="1.0" />
+        <preference name="CrashRecoveryDebugMode" default="false" />
+        <preference name="CrashRecoveryDebugLevel" default="basic" />
+        <preference name="ShowDebugAlerts" default="false" />
+        <preference name="LogToJavaScript" default="false" />
+        <preference name="BackupLocalStorage" default="false" />
+        
+        <framework src="WebKit.framework" />
+        <framework src="UIKit.framework" />
+    </platform>
+    
+    <info>
+        This plugin provides automatic recovery functionality for WKWebView crashes 
+        in Cordova iOS applications, particularly addressing the issue where WebViews 
+        become unresponsive after being in background for extended periods.
+    </info>
+</plugin>

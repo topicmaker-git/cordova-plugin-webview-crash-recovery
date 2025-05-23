@@ -1,0 +1,39 @@
+{
+  "name": "cordova-plugin-webview-crash-recovery",
+  "version": "1.0.0",
+  "description": "Cordova plugin to recover from iOS WKWebView crashes when app returns from background",
+  "cordova": {
+    "id": "cordova-plugin-webview-crash-recovery",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/cordova-plugin-webview-crash-recovery.git"
+  },
+  "keywords": [
+    "cordova",
+    "webview",
+    "wkwebview",
+    "crash",
+    "recovery",
+    "ios",
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "engines": {
+    "cordovaDependencies": {
+      "1.0.0": {
+        "cordova": ">=6.0.0",
+        "cordova-ios": ">=6.0.0"
+      }
+    }
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourusername/cordova-plugin-webview-crash-recovery/issues"
+  },
+  "homepage": "https://github.com/yourusername/cordova-plugin-webview-crash-recovery#readme"
+}
